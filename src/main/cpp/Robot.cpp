@@ -445,7 +445,7 @@ void defineAutoStateFunctions() {
 	};
 
 	AutoInit[AINTAKING] = []() {
-		intakeShooter.SetAngle(91);
+		intakeShooter.SetAngle(105);
 		intakeShooter.SetIntake(70);
 	};
 	AutoPeriodic[AINTAKING] = []() {
