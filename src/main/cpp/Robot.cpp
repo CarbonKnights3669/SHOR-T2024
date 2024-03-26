@@ -269,7 +269,7 @@ void Robot::TeleopPeriodic(){
 				intakeShooter.SetIntake(100);
 				break;
 			case TeleopState::INTAKING:
-				intakeShooter.SetAngle(105);
+				intakeShooter.SetAngle(100);
 				intakeShooter.SetIntake(80);
 				break;
 			case TeleopState::NOTEALIGN1:
@@ -461,7 +461,7 @@ void defineAutoStateFunctions() {
 	};
 
 	AutoInit[AINTAKING] = []() {
-		intakeShooter.SetAngle(105);
+		intakeShooter.SetAngle(100);
 		intakeShooter.SetIntake(70);
 	};
 	AutoPeriodic[AINTAKING] = []() {
