@@ -61,6 +61,12 @@ public:
         pos += posChange * polar<float>(0.25, angle);
     }
 
+    float GetTurnRateOffset(float setpointAngle) {
+        float output = setpointAngle - angle;
+        am::limit(output);
+        return output * 0.3;
+    }
+
     void SetPosition(complex<float> position){
         posSetpoint = position;
     }
