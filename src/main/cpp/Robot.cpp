@@ -257,7 +257,7 @@ void Robot::TeleopPeriodic(){
 				intakeShooter.SetIntake(100);
 				break;
 			case TeleopState::INTAKING:
-				intakeShooter.SetAngle(100);
+				intakeShooter.SetAngle(105);
 				intakeShooter.SetIntake(80);
 				break;
 			case TeleopState::NOTEALIGN1:
