@@ -84,6 +84,10 @@ void Robot::TeleopPeriodic(){
 				timer.Restart();
 				teleopState = TeleopState::RAMPING;
 			}
+			if (key_pad.GetRawButton(9) && intakeShooter.GetNotePresent()) {
+				timer.Restart();
+				teleopState = TeleopState::DISTRAMP;
+			}
 			if (!key_pad.GetRawButton(11)) {
 				teleopState = TeleopState::DEFAULT;
 			}
@@ -95,7 +99,7 @@ void Robot::TeleopPeriodic(){
 		case TeleopState::DISTAIM:
 			if (key_pad.GetRawButton(12) && intakeShooter.GetNotePresent()) {
 				timer.Restart();
-				teleopState = TeleopState::RAMPING;
+				teleopState = TeleopState::DISTRAMP;
 			}
 			if (!key_pad.GetRawButton(9)) {
 				teleopState = TeleopState::DEFAULT;
@@ -111,6 +115,11 @@ void Robot::TeleopPeriodic(){
 			}
 			break;
 		case TeleopState::RAMPING:
+			if (timer.HasElapsed(1.1_s)){
+				teleopState = TeleopState::SHOOTING;
+			}
+			break;
+		case TeleopState::DISTRAMP:
 			if (timer.HasElapsed(1.1_s)){
 				teleopState = TeleopState::SHOOTING;
 			}
@@ -252,6 +261,9 @@ void Robot::TeleopPeriodic(){
 				break;
 			case TeleopState::RAMPING:
 				intakeShooter.SetShooter(60);
+				break;
+			case TeleopState::DISTRAMP:
+				intakeShooter.SetShooter(70);
 				break;
 			case TeleopState::SHOOTING:
 				intakeShooter.SetIntake(100);

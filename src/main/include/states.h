@@ -3,6 +3,7 @@ enum TeleopState {
     DEFAULT,
     DEFENDING,
     DISTAIM,
+    DISTRAMP,
     PODAIM,
     ARMDEFAULT,
     INTAKING,
