@@ -17,7 +17,8 @@ void Robot::RobotInit()
 	climb.init();
 	defineAutoStateFunctions();
 	// Creates UsbCamera and MjpegServer [1] and connects them
-	frc::CameraServer::StartAutomaticCapture();
+	//frc::CameraServer::StartAutomaticCapture();
+	//frc::CameraServer::PutVideo("Blur", 640, 480);
 }
 void Robot::RobotPeriodic() {}
 
@@ -30,7 +31,7 @@ void Robot::AutonomousPeriodic() {
 	tx = ll.getSpeakerYaw();
 	ty = ll.getSpeakerPitch();
 	if (autoState != AutoState::AINTAKING) {
-		pitch = 0.0038*pow(ty, 2)+0.6508*ty+65.3899;
+		pitch = 0.0038*pow(ty, 2)+0.6508*ty+61.3899;
 		intakeShooter.SetAngle(pitch);
 	}
 	intakeShooter.RunAnglePID();
@@ -75,8 +76,10 @@ void Robot::TeleopPeriodic(){
 	lastTeleopState = teleopState;
 	frc::SmartDashboard::PutNumber("Pitch: ", pitch);
 	// this switch case runs for each state
+	// 56.814 podium angle
 	switch (teleopState) {
 		case TeleopState::AIMING:
+			turnSpeed = 0.3;
 			if (key_pad.GetRawButton(12) && intakeShooter.GetNotePresent()) {
 				timer.Restart();
 				teleopState = TeleopState::RAMPING;
@@ -86,7 +89,7 @@ void Robot::TeleopPeriodic(){
 			}
 			tROffset = -ll.getSpeakerYaw() / 35.0;
 			ty = ll.getSpeakerPitch();
-			pitch = 0.0038*pow(ty, 2)+0.6508*ty+65.3899;
+			pitch = 0.0038*pow(ty, 2)+0.6508*ty+60.3899;
 			intakeShooter.SetAngle(pitch);
 			break;
 		case TeleopState::DISTAIM:
@@ -95,6 +98,15 @@ void Robot::TeleopPeriodic(){
 				teleopState = TeleopState::RAMPING;
 			}
 			if (!key_pad.GetRawButton(9)) {
+				teleopState = TeleopState::DEFAULT;
+			}
+			break;
+		case TeleopState::PODAIM:
+			if (key_pad.GetRawButton(12) && intakeShooter.GetNotePresent()) {
+				timer.Restart();
+				teleopState = TeleopState::RAMPING;
+			}
+			if (!key_pad.GetRawButton(13)) {
 				teleopState = TeleopState::DEFAULT;
 			}
 			break;
@@ -204,6 +216,7 @@ void Robot::TeleopPeriodic(){
 			}
 			break;
 		case TeleopState::DEFAULT:
+			turnSpeed = 0.65;
 			if (key_pad.GetRawButton(9)) {
 				teleopState = TeleopState::DISTAIM;
 			}
@@ -212,6 +225,9 @@ void Robot::TeleopPeriodic(){
 			}
 			if (key_pad.GetRawButton(11)) {
 				teleopState = TeleopState::AIMING;
+			}
+			if (key_pad.GetRawButton(13)) {
+				teleopState = TeleopState::PODAIM;
 			}
 			if (key_pad.GetRawButtonPressed(1)) {
 				teleopState = TeleopState::DEFENDING;
@@ -229,7 +245,10 @@ void Robot::TeleopPeriodic(){
 	if (teleopState != lastTeleopState) {
 		switch (teleopState) {
 			case TeleopState::DISTAIM:
-				intakeShooter.SetAngle(55);
+				intakeShooter.SetAngle(45);
+				break;
+			case TeleopState::PODAIM:
+				intakeShooter.SetAngle(56.814);
 				break;
 			case TeleopState::RAMPING:
 				intakeShooter.SetShooter(60);
@@ -238,7 +257,7 @@ void Robot::TeleopPeriodic(){
 				intakeShooter.SetIntake(100);
 				break;
 			case TeleopState::INTAKING:
-				intakeShooter.SetAngle(94);
+				intakeShooter.SetAngle(100);
 				intakeShooter.SetIntake(80);
 				break;
 			case TeleopState::NOTEALIGN1:
@@ -278,7 +297,7 @@ void Robot::TeleopPeriodic(){
 				break;
 			// trap procedure:
 			case TeleopState::TRAPTRANSFER:
-				arm.SetAngle(20);
+				arm.SetAngle(21);
 				arm.SetHeight(0);
 				arm.SetRollerSpeed(130);
 				intakeShooter.SetAngle(15);
@@ -317,9 +336,9 @@ void Robot::TeleopPeriodic(){
 			case TeleopState::TRAPSCOREREADY:
 				timer.Restart();
 				intakeShooter.SetAngle(15);
-				arm.SetAngle(235);
+				arm.SetAngle(215);
 				arm.SetHeight(20.5);
-				arm.SetRollerSpeed(50);
+				arm.SetRollerSpeed(55);
 				intakeShooter.SetIntakeSpeed(0);
 				intakeShooter.SetShooter(0);
 				climb.SetHeight(0);
@@ -331,7 +350,7 @@ void Robot::TeleopPeriodic(){
 			case TeleopState::TRAPSCORE:
 				timer.Restart();
 				intakeShooter.SetAngle(15);
-				arm.SetAngle(235);
+				arm.SetAngle(215);
 				arm.SetHeight(20.5);
 				arm.SetRollerSpeed(-100);
 				intakeShooter.SetIntakeSpeed(0);
@@ -352,8 +371,10 @@ void Robot::TeleopPeriodic(){
 	float y = -controller.GetLeftX();
 	float tR = -controller.GetRightX() + tROffset;
 	float rt = (controller.GetRightTriggerAxis()*0.5)+0.5;
+	float tA = (atan2(-controller.GetLeftY(), controller.GetLeftX()));
 	complex<float> velocity = complex<float>(x*rt, y*rt);
-	float turnRate = tR*0.3;
+	float turnRate = tR*turnSpeed;
+	swerve.set(velocity, turnRate);
 	swerve.set(velocity, turnRate);
 	intakeShooter.RunAnglePID();
 	if (controller.GetAButtonPressed()) {
@@ -442,7 +463,7 @@ void defineAutoStateFunctions() {
 
 	AutoInit[ARAMPING] = []() {
 		timer.Restart();
-		intakeShooter.SetShooter(60);
+		intakeShooter.SetShooter(55);
 	};
 	AutoPeriodic[ARAMPING] = []() {
 		if (timer.HasElapsed(1_s)){

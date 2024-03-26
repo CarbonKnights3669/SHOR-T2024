@@ -89,7 +89,7 @@ public:
 		
  		m_angle.RestoreFactoryDefaults();
         m_angle.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
- 		m_angle.SetInverted(true);
+ 		m_angle.SetInverted(false);
  		// anglePID.SetP(0.1/angleDPR);
  		// anglePID.SetI(0);
  		// anglePID.SetD(6/angleDPR);

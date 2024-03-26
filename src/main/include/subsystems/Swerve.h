@@ -121,6 +121,10 @@ public:
         return modules[i].getMotorPos();
     }
 
+    float GetAngle() {
+        return gyro.GetAngle();
+    }
+
 private:
     AHRS gyro{frc::SPI::Port::kMXP};
     Module modules[4] = {

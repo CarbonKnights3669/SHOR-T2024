@@ -20,6 +20,7 @@ using namespace std;
 
 unsigned int x = 0; // current autoPos setpoint index
 float pitch;
+float turnSpeed = 0.65;
 float tx;
 float ty;
 bool targetValid;

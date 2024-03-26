@@ -3,6 +3,7 @@ enum TeleopState {
     DEFAULT,
     DEFENDING,
     DISTAIM,
+    PODAIM,
     ARMDEFAULT,
     INTAKING,
     NOTEALIGN1,
