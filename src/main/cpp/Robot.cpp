@@ -369,10 +369,13 @@ void Robot::TeleopPeriodic(){
 	}
 	float dB = 0.03;
 	complex<float> v = complex<float>(-controller.GetLeftY(), -controller.GetLeftX());
-	float angle = arg(complex<float>(-controller.GetRightY(), -controller.GetRightX()));
+	complex<float> rightV = complex<float>(-controller.GetRightY(), -controller.GetRightX());
+	if (abs(rightV) > 0.5) {
+		angleSetpoint = arg(rightV);
+	}
 	float tR = 0;
 	if (controller.GetLeftBumper()) {
-		tROffset = swerve.GetTurnRateOffset(angle);
+		tROffset = swerve.GetTurnRateOffset(angleSetpoint);
 	} else {
 		float tR = -controller.GetRightX();
 	}
