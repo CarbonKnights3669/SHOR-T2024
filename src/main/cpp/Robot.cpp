@@ -348,7 +348,7 @@ void Robot::TeleopPeriodic(){
 			case TeleopState::TRAPSCOREREADY:
 				timer.Restart();
 				intakeShooter.SetAngle(15);
-				arm.SetAngle(215);
+				arm.SetAngle(220);
 				arm.SetHeight(20.5);
 				arm.SetRollerSpeed(55);
 				intakeShooter.SetIntakeSpeed(0);
@@ -362,7 +362,7 @@ void Robot::TeleopPeriodic(){
 			case TeleopState::TRAPSCORE:
 				timer.Restart();
 				intakeShooter.SetAngle(15);
-				arm.SetAngle(215);
+				arm.SetAngle(220);
 				arm.SetHeight(20.5);
 				arm.SetRollerSpeed(-100);
 				intakeShooter.SetIntakeSpeed(0);
@@ -389,7 +389,7 @@ void Robot::TeleopPeriodic(){
 	if (controller.GetLeftBumper()) {
 		tROffset = swerve.GetTurnRateOffset(angleSetpoint);
 	} else {
-		float tR = -controller.GetRightX();
+		tR = -controller.GetRightX();
 	}
 	float rateMultiplier = (controller.GetRightTriggerAxis()*0.5)+0.5;
 	// apply smooth deadband
