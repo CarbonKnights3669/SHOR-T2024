@@ -381,7 +381,16 @@ void Robot::TeleopPeriodic(){
 	}
 	float dB = 0.03;
 	complex<float> v = complex<float>(-controller.GetLeftY(), -controller.GetLeftX());
-	float tR = -controller.GetRightX();
+	complex<float> rightV = complex<float>(-controller.GetRightY(), -controller.GetRightX());
+	if (abs(rightV) > 0.5) {
+		angleSetpoint = arg(rightV);
+	}
+	float tR = 0;
+	if (controller.GetLeftBumper()) {
+		tROffset = swerve.GetTurnRateOffset(angleSetpoint);
+	} else {
+		float tR = -controller.GetRightX();
+	}
 	float rateMultiplier = (controller.GetRightTriggerAxis()*0.5)+0.5;
 	// apply smooth deadband
 	complex<float> velocity = (abs(v)>dB) ? v*(1 - dB/abs(v))/(1-dB) : 0;

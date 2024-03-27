@@ -24,6 +24,7 @@ float turnSpeed = 0.65;
 float tx;
 float ty;
 bool targetValid;
+float angleSetpoint = 0;
 float tROffset = 0;
 
 struct autoValue
