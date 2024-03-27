@@ -257,7 +257,7 @@ void Robot::TeleopPeriodic(){
 				intakeShooter.SetAngle(45);
 				break;
 			case TeleopState::PODAIM:
-				intakeShooter.SetAngle(56.814);
+				intakeShooter.SetAngle(53.814);
 				break;
 			case TeleopState::RAMPING:
 				intakeShooter.SetShooter(60);
