@@ -31,7 +31,7 @@ void Robot::AutonomousPeriodic() {
 	tx = ll.getSpeakerYaw();
 	ty = ll.getSpeakerPitch();
 	if (autoState != AutoState::AINTAKING) {
-		pitch = 0.0038*pow(ty, 2)+0.6508*ty+61.3899;
+		pitch = 0.0038*pow(ty, 2)+0.6508*ty+62.3899;
 		intakeShooter.SetAngle(pitch);
 	}
 	intakeShooter.RunAnglePID();
@@ -93,7 +93,7 @@ void Robot::TeleopPeriodic(){
 			}
 			tROffset = -ll.getSpeakerYaw() / 117;
 			ty = ll.getSpeakerPitch();
-			pitch = 0.0038*pow(ty, 2)+0.6508*ty+60.3899;
+			pitch = 0.0038*pow(ty, 2)+0.6508*ty+62.3899;
 			intakeShooter.SetAngle(pitch);
 			break;
 		case TeleopState::DISTAIM:
@@ -254,10 +254,10 @@ void Robot::TeleopPeriodic(){
 	if (teleopState != lastTeleopState) {
 		switch (teleopState) {
 			case TeleopState::DISTAIM:
-				intakeShooter.SetAngle(45);
+				intakeShooter.SetAngle(60);
 				break;
-			case TeleopState::PODAIM:
-				intakeShooter.SetAngle(53.814);
+			case TeleopState::PODAIM://54.814
+				intakeShooter.SetAngle(54.814);
 				break;
 			case TeleopState::RAMPING:
 				intakeShooter.SetShooter(60);
@@ -269,7 +269,7 @@ void Robot::TeleopPeriodic(){
 				intakeShooter.SetIntake(100);
 				break;
 			case TeleopState::INTAKING:
-				intakeShooter.SetAngle(100);
+				intakeShooter.SetAngle(95);
 				intakeShooter.SetIntake(80);
 				break;
 			case TeleopState::NOTEALIGN1:
@@ -470,7 +470,7 @@ void defineAutoStateFunctions() {
 	};
 
 	AutoInit[AINTAKING] = []() {
-		intakeShooter.SetAngle(100);
+		intakeShooter.SetAngle(95);
 		intakeShooter.SetIntake(70);
 	};
 	AutoPeriodic[AINTAKING] = []() {
