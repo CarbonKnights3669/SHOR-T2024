@@ -31,7 +31,7 @@ void Robot::AutonomousPeriodic() {
 	tx = ll.getSpeakerYaw();
 	ty = ll.getSpeakerPitch();
 	if (autoState != AutoState::AINTAKING) {
-		pitch = 0.0038*pow(ty, 2)+0.6508*ty+62.3899;
+		pitch = 0.0038*pow(ty, 2)+0.6508*ty+64.3899;
 		intakeShooter.SetAngle(pitch);
 	}
 	intakeShooter.RunAnglePID();
@@ -93,7 +93,7 @@ void Robot::TeleopPeriodic(){
 			}
 			tROffset = -ll.getSpeakerYaw() / 117;
 			ty = ll.getSpeakerPitch();
-			pitch = 0.0038*pow(ty, 2)+0.6508*ty+62.3899;
+			pitch = 0.0038*pow(ty, 2)+0.6508*ty+64.3899;
 			intakeShooter.SetAngle(pitch);
 			break;
 		case TeleopState::DISTAIM:
@@ -134,6 +134,9 @@ void Robot::TeleopPeriodic(){
 			if (!intakeShooter.GetNotePresent()) {
 				teleopState = TeleopState::AMPOS;
 			}
+			if (key_pad.GetRawButtonPressed(14) && key_pad.GetRawButton(4) && key_pad.GetRawButton(7)) {
+				teleopState = TeleopState::NOTEJECT;
+			}
 			break;
 		case TeleopState::AMPOS:
 			if (key_pad.GetRawButtonPressed(2)) {
@@ -159,6 +162,9 @@ void Robot::TeleopPeriodic(){
 		case TeleopState::TRAPTRANSFER:
 			if (!intakeShooter.GetNotePresent()){
 				teleopState = TeleopState::INTAKECLEAR;
+			}
+			if (key_pad.GetRawButtonPressed(14) && key_pad.GetRawButton(4) && key_pad.GetRawButton(7)) {
+				teleopState = TeleopState::NOTEJECT;
 			}
 			break;
 		case TeleopState::INTAKECLEAR:
@@ -224,6 +230,10 @@ void Robot::TeleopPeriodic(){
 				teleopState = TeleopState::DEFAULT;
 			}
 			break;
+		case TeleopState::NOTEJECT:
+			if (timer.HasElapsed(0.65_s)) {
+				teleopState = TeleopState::DEFAULT;
+			}
 		case TeleopState::DEFAULT:
 			turnSpeed = 0.65;
 			if (key_pad.GetRawButton(9)) {
@@ -237,6 +247,9 @@ void Robot::TeleopPeriodic(){
 			}
 			if (key_pad.GetRawButton(13)) {
 				teleopState = TeleopState::PODAIM;
+			}
+			if (key_pad.GetRawButtonPressed(14)) {
+				teleopState = TeleopState::NOTEJECT;
 			}
 			if (key_pad.GetRawButtonPressed(1)) {
 				teleopState = TeleopState::DEFENDING;
@@ -256,14 +269,14 @@ void Robot::TeleopPeriodic(){
 			case TeleopState::DISTAIM:
 				intakeShooter.SetAngle(60);
 				break;
-			case TeleopState::PODAIM://54.814
-				intakeShooter.SetAngle(54.814);
+			case TeleopState::PODAIM://55.814
+				intakeShooter.SetAngle(55.814);
 				break;
 			case TeleopState::RAMPING:
 				intakeShooter.SetShooter(60);
 				break;
 			case TeleopState::DISTRAMP:
-				intakeShooter.SetShooter(70);
+				intakeShooter.SetShooter(55);
 				break;
 			case TeleopState::SHOOTING:
 				intakeShooter.SetIntake(100);
@@ -350,7 +363,7 @@ void Robot::TeleopPeriodic(){
 				intakeShooter.SetAngle(15);
 				arm.SetAngle(220);
 				arm.SetHeight(20.5);
-				arm.SetRollerSpeed(55);
+				arm.SetRollerSpeed(45);
 				intakeShooter.SetIntakeSpeed(0);
 				intakeShooter.SetShooter(0);
 				climb.SetHeight(0);
@@ -377,6 +390,10 @@ void Robot::TeleopPeriodic(){
 				arm.SetHeight(0);
 				arm.SetRollerSpeed(0);
 				break;
+			case TeleopState::NOTEJECT:
+				timer.Restart();
+				intakeShooter.SetIntakeSpeed(-150);
+				break;
 		}
 	}
 	float dB = 0.03;
@@ -391,13 +408,13 @@ void Robot::TeleopPeriodic(){
 	} else {
 		tR = -controller.GetRightX();
 	}
-	float rateMultiplier = (controller.GetRightTriggerAxis()*0.5)+0.5;
+	float rateMultiplier = 0.3;//(controller.GetRightTriggerAxis()*0.5)+0.5;
 	// apply smooth deadband
 	complex<float> velocity = (abs(v)>dB) ? v*(1 - dB/abs(v))/(1-dB) : 0;
 	float turnRate = (abs(tR)>dB) ? tR*(1 - dB/abs(tR))/(1-dB) : 0;
 	// limit rates
 	velocity *= rateMultiplier;
-	turnRate *= turnSpeed;
+	turnRate *= rateMultiplier;
 	turnRate += tROffset;
 	swerve.set(velocity, turnRate);
 	swerve.set(velocity, turnRate);

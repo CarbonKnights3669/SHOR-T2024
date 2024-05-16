@@ -4,6 +4,7 @@ enum TeleopState {
     DEFENDING,
     DISTAIM,
     DISTRAMP,
+    NOTEJECT,
     PODAIM,
     ARMDEFAULT,
     INTAKING,
