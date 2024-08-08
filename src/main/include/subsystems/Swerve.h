@@ -1,8 +1,8 @@
 #pragma once
 
-#include <AHRS.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include "subsystems/SwerveModule.h"
+#include "ctre/phoenix6/Pigeon2.hpp"
 
 using namespace std;
 
@@ -23,7 +23,7 @@ public:
 
     const float slewRate = 0.04;
     void set(complex<float> velocity, float turnRate, bool noAcceleration = false){
-        angle = -gyro.GetYaw()*(M_PI/180);
+        angle = gyro.GetYaw().GetValueAsDouble()*(M_PI/180);
         targetVelocity = velocity;
 
         // robot orient the velocity
@@ -31,7 +31,7 @@ public:
 
         // find fastest module speed
         float fastest = 1;
-        for (Module module : modules){
+        for (Module &module : modules){
             float speed = abs(module.getVelocity(velocity, turnRate));
             if (speed > fastest){
                 fastest = speed;
@@ -54,7 +54,7 @@ public:
 
         // calculate odometry
         posChange = complex<float>(0, 0);
-        for (Module module : modules) {
+        for (Module &module : modules) {
             module.set(targetVelocity, currentTurnRate);
             posChange += module.getPositionChange();
         }
@@ -78,7 +78,7 @@ public:
     // drive toward the position setpoint
     void RunPID(float tx) {
         // calculate PID Response
-        angle = -gyro.GetYaw()*(M_PI/180);
+        angle = gyro.GetYaw().GetValueAsDouble()*(M_PI/180);
         posError = posSetpoint-pos;
         complex<float> posPIDoutput = posP*posError;
         float turnRate = -tx / 100;
@@ -95,7 +95,7 @@ public:
         posPIDoutput *= polar<float>(1, -angle);
         // calculate odometry
         posChange = complex<float>(0, 0);
-        for (Module module : modules){
+        for (Module &module : modules){
             module.set(posPIDoutput, turnRate);
             posChange += module.getPositionChange();
         }
@@ -103,13 +103,13 @@ public:
     }
 
     void init(){
-        for (Module module : modules){
+        for (Module &module : modules){
             module.init();
         }
     }
 
     void resetPos() {
-        for (Module module : modules) {
+        for (Module &module : modules) {
             module.resetEncoders();
         }
         pos = complex<float>(0,0);
@@ -132,12 +132,12 @@ public:
     }
 
 private:
-    AHRS gyro{frc::SPI::Port::kMXP};
+    ctre::phoenix6::hardware::Pigeon2 gyro{1, "CTREdevices"};
     Module modules[4] = {
         Module{1, complex<float>(1, 1)},
         Module{2, complex<float>(-1, 1)},
-        Module{3, complex<float>(1, -1)},
-        Module{4, complex<float>(-1, -1)}
+        Module{3, complex<float>(-1, -1)},
+        Module{4, complex<float>(1, -1)}
     };
 
 } swerve;

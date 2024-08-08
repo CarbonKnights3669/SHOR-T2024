@@ -14,8 +14,8 @@ public:
     Module(int modID, complex<float> pos){
         turnVector = pos*complex<float>(0, 1)/abs(pos);
         dMotor = new ctre::phoenix6::hardware::TalonFX(modID+10, "CTREdevices");
-        encoder = new ctre::phoenix6::hardware::CANcoder(modID+20, "CTREdevices");
-        sMotor = new rev::CANSparkMax(modID+30, rev::CANSparkMax::MotorType::kBrushless);
+        sMotor = new ctre::phoenix6::hardware::TalonFX(modID+20, "CTREdevices");
+        encoder = new ctre::phoenix6::hardware::CANcoder(modID+30, "CTREdevices");
     }
     void init() {
         dMotor->SetNeutralMode(ctre::phoenix6::signals::NeutralModeValue::Brake);
@@ -80,7 +80,7 @@ private:
     ctre::phoenix6::hardware::TalonFX *dMotor;
     ctre::phoenix6::hardware::CANcoder *encoder;
 	ctre::phoenix6::controls::VelocityTorqueCurrentFOC m_velocity{0_tps, 0_tr_per_s_sq, 0_A, 1, false};
-    rev::CANSparkMax *sMotor;
+    ctre::phoenix6::hardware::TalonFX *sMotor;
     complex<float> turnVector;
     complex<float> modPosChange;
     float motorPosChg = 0;
@@ -90,9 +90,9 @@ private:
 /*
 
 # # # # # # # # # # # # # # # # # # #
-# C:11                         C:13 #
-# E:21                         E:23 #
-# N:31                         N:33 #
+# DM:11                       DM:14 #
+# SM:21                       SM:24 #
+# E:31                         E:34 #
 #                                   #
 #                ^                  #
 #                | x                #
@@ -100,9 +100,9 @@ private:
 #                                   #
 #                                   #
 #                                   #
-# C:12                         C:14 #
-# E:22                         E:24 #
-# N:32                         N:34 #
+# DM:12                       DM:13 #
+# SM:22                       SM:23 #
+# E:32                         E:33 #
 # # # # # # # # # # # # # # # # # # #
 
 */
